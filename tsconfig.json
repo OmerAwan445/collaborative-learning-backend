@@ -143,8 +143,8 @@
 // }
   "compilerOptions": {
     "target": "ES2023", // Modern JavaScript features for better performance and compatibility.
-    "module": "NodeNext", // Use Node.js native ES modules.
-    "moduleResolution": "NodeNext", // Align with Node.js module resolution.
+    "module": "CommonJS", // Use Node.js native ES modules.
+    "moduleResolution": "node", // Align with Node.js module resolution.
     "esModuleInterop": true, // Simplify CommonJS and ES module interoperability.
     "forceConsistentCasingInFileNames": true, // Prevent case-sensitive import errors.
     "strict": true, // Enable all strict type-checking options for better code quality.

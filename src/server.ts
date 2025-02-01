@@ -1,5 +1,5 @@
-import { cors } from 'cors/cors.js';
-import { allAppRoutes } from './routers/index.routes.js';
+import { cors } from 'cors/cors';
+import { allAppRoutes } from './routers/index.routes';
 import express from 'express';
 
 export function configServer() {

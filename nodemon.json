@@ -3,7 +3,7 @@
     "ignore": [".git", "node_modules/**/node_modules"],
     "verbose": true,
     "execMap": {
-      "ts": "npx tsx --env-file=.env"
+      "ts": "npx tsx"
     },
     "watch": ["src/"],
     "ext": "js,json,ts"

@@ -1,6 +1,7 @@
-import { NODE_ENV } from '@config/index.js';
-import { connectToDatabase } from 'db/db.js';
-import { configServer } from 'server.js';
+import 'tsconfig-paths/register'; // Add this line at the top
+import { NODE_ENV } from '@config/index';
+import { connectToDatabase } from 'db/db';
+import { configServer } from 'server';
 
 async function bootstrap() {
   await connectToDatabase();
