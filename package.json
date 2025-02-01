@@ -1,0 +1,48 @@
+{
+  "name": "collaborative-learning-backend",
+  "version": "1.0.0",
+  "description": "This project is created for the backend of the collaborative learning platform which is a pratice project.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "dev": "nodemon -L src/index.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
+    "prettier:fix": "prettier --write src"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Muhammad Umer",
+    "email": "omerawan445@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "Muhammad Umer",
+      "email": "omerawan445@gmail.com"
+    }
+  ],
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.7",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.13.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "eslint": "^9.19.0",
+    "globals": "^15.9.0",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.2.0"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "mongodb": "^6.13.0",
+    "mongoose": "^8.9.6",
+    "nodemon": "^3.1.9"
+  }
+}
