@@ -10,6 +10,7 @@ export function configServer() {
   app.use(cors);
 
   app.use('/api/v1', allAppRoutes);
+  app.use('/', (_, res) => res.send('Welcome to the API'));
 
   return app;
 }

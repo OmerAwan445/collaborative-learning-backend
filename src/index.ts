@@ -14,9 +14,12 @@ async function bootstrap() {
   app.listen(PORT, () => {
     console.log(`Server is running on port: ${PORT} in ${NODE_ENV} mode`);
   });
+  return app;
 }
 
-bootstrap().catch((err) => {
+const app = bootstrap().catch((err) => {
   console.error('Failed to start the application:', err);
   process.exit(1);
 });
+
+export default app;
