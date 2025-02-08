@@ -1,7 +1,7 @@
 import 'tsconfig-paths/register'; // Add this line at the top
-import { NODE_ENV } from '@config/index';
-import { connectToDatabase } from 'db/db';
-import { configServer } from 'server';
+import { NODE_ENV } from '@utils/helpers/config';
+import { connectToDatabase } from '@frameworks/mongoDB/db';
+import { configServer } from '@frameworks/express/server';
 
 async function bootstrap() {
   await connectToDatabase();

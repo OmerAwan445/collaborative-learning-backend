@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { CORS_ALLOW_ORIGIN } from '../config/index.js';
+import { CORS_ALLOW_ORIGIN } from '../../utils/helpers/config.js';
 
 const CORS = (req: Request, res: Response, next: NextFunction) => {
   const allowedOrigins = CORS_ALLOW_ORIGIN.join(',');

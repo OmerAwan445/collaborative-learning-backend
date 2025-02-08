@@ -155,11 +155,16 @@
     "rootDir": "src", // Ensure TypeScript only compiles files in the `src` directory.
     "baseUrl": "./src/", // Base directory for module resolution.
     "paths": {
-      "@controllers/*": ["controllers/*"],
-      "@middlewares/*": ["middlewares/*"],
-      "@routers/*": ["routers/*"],
-      "@config/*": ["config/*"], // Add a path for configuration files.
-      "~types/*": ["types/*"], // Use `@types` instead of `~types` for consistency.
+      "@interfaces/*": ["adapters/repositories/interfaces/*"],
+      "@repositories/*": ["adapters/repositories/*"],
+      "@controllers/*": ["adapters/controllers/*"],
+      "@routers/*": ["frameworks/express/routers/*"],
+      "~types/*": ["utils/types/*"],
+      "@utils/*": ["utils/*"],
+      "@frameworks/*": ["frameworks/*"],
+      "@adapters/*": ["adapters/*"],
+      "@entites/*": ["entites/*"],
+      "@interactors/*": ["interactors/*"],
     },
     "removeComments": true, // Remove comments in the compiled output.
     "noUnusedLocals": true, // Enable to catch unused variables (improves code quality).

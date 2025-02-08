@@ -89935,14 +89935,14 @@ module.exports = __toCommonJS(index_exports);
 // node_modules/tsconfig-paths/register.js
 require_lib2().register();
 
-// src/config/index.ts
+// src/utils/helpers/config.ts
 var PORT = process.env.PORT;
 var NODE_ENV = process.env.NODE_ENV;
 var FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL;
 var CORS_ALLOW_ORIGIN = [FRONTEND_BASE_URL];
 var DB_CONN_STR = process.env.DB_CONN_STR;
 
-// src/db/db.ts
+// src/frameworks/mongoDB/db.ts
 var import_mongoose = __toESM(require_mongoose2());
 async function connectToDatabase() {
   import_mongoose.default.connection.on("connected", () => {
@@ -89954,7 +89954,7 @@ async function connectToDatabase() {
   await import_mongoose.default.connect(DB_CONN_STR);
 }
 
-// src/cors/cors.ts
+// src/frameworks/cors/cors.ts
 var CORS = (req, res, next) => {
   const allowedOrigins = CORS_ALLOW_ORIGIN.join(",");
   const origin = req.headers.origin;
@@ -89982,32 +89982,185 @@ var CORS = (req, res, next) => {
 };
 var cors = CORS;
 
-// src/routers/index.routes.ts
+// src/frameworks/express/routers/index.routes.ts
 var import_express2 = __toESM(require_express2());
 
-// src/routers/auth.routes.ts
-var import_express = __toESM(require_express2());
-var authRoutes = (0, import_express.Router)();
-authRoutes.post("/signup", () => {
-});
-authRoutes.post("/signin", () => {
-});
+// src/utils/helpers/catchAsyncError.ts
+function catchAsyncError(fn) {
+  return (req, res, next) => {
+    fn(req, res, next).catch(next);
+  };
+}
 
-// src/routers/index.routes.ts
+// src/adapters/controllers/auth.controller.ts
+var AuthController = class {
+  _authInteractor;
+  constructor(authInteractor2) {
+    this._authInteractor = authInteractor2;
+  }
+  signup = catchAsyncError(async (_, res) => {
+    console.log("Request received");
+    const data = await this._authInteractor.signup();
+    return res.send(data);
+  });
+  signin = catchAsyncError(async (_, res) => {
+    this._authInteractor.signin();
+    return res.send("User signed in");
+  });
+};
+
+// src/interactors/auth/AuthInteractor.ts
+var AuthInteractor = class {
+  _userRepo;
+  constructor(userRepo2) {
+    this._userRepo = userRepo2;
+  }
+  async signin() {
+    const user = await this._userRepo.getById();
+    return user;
+  }
+  async signup() {
+    const data = this._userRepo.create();
+    return data;
+  }
+};
+
+// src/adapters/repositories/implements/UserRepository.ts
+var UserRepository = class {
+  async getById() {
+    console.log("User found");
+    return null;
+  }
+  async create() {
+    console.log("User created");
+    return null;
+  }
+};
+
+// src/frameworks/express/routers/auth.routes.ts
+var import_express = __toESM(require_express2());
+var userRepo = new UserRepository();
+var authInteractor = new AuthInteractor(userRepo);
+var authController = new AuthController(authInteractor);
+var authRoutes = (0, import_express.Router)();
+authRoutes.post("/signup", authController.signup);
+authRoutes.post("/signin", authController.signin);
+
+// src/frameworks/express/routers/index.routes.ts
 var allAppRoutes = (0, import_express2.Router)();
 allAppRoutes.use("/test", (_, res) => {
   res.send("Test Response");
 });
 allAppRoutes.use("/auth", authRoutes);
 
-// src/server.ts
+// src/frameworks/express/server.ts
 var import_express3 = __toESM(require_express2());
+
+// src/utils/helpers/ApiResponse.ts
+var ApiResponse = class _ApiResponse {
+  error;
+  statusCode;
+  message;
+  data;
+  count;
+  constructor(error, statusCode, message, data, count) {
+    this.error = error;
+    this.statusCode = statusCode;
+    this.message = message;
+    this.count = count;
+    this.data = data;
+  }
+  static success(data, message = "Success", statusCode = 200, count) {
+    return new _ApiResponse(false, statusCode, message, data, count);
+  }
+  static error(message = "Internal Server Error", statusCode = 500, data) {
+    return new _ApiResponse(true, statusCode, message, data ?? []);
+  }
+};
+var ApiResponse_default = ApiResponse;
+
+// src/utils/errors/AppError.ts
+var AppError = class extends Error {
+  // Custom Error class
+  isOperational;
+  statusCode;
+  /**
+      * @param {string} message
+      * @param {number} statusCode
+  */
+  constructor(message, statusCode) {
+    super(message);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.message = message;
+    this.statusCode = statusCode;
+    this.isOperational = true;
+    Error.captureStackTrace(this);
+  }
+};
+
+// src/utils/helpers/ErrorHandler.ts
+var isDevEnvironment = process.env.NODE_ENV === "development";
+var ErrorHandler = class {
+  responseStream;
+  error;
+  constructor(responseStream, error) {
+    this.responseStream = responseStream;
+    this.error = error;
+  }
+  async handleError() {
+    await this.logError();
+    return await this.checkForDatabaseErrorAndSendResponse() || await this.crashIfUntrustedErrorOrSendResponse();
+  }
+  async logError() {
+    console.error(this.error, "error Logger");
+  }
+  async crashIfUntrustedErrorOrSendResponse() {
+    if (this.error instanceof AppError) {
+      if (!isDevEnvironment && this.error.statusCode === 500) this.error.message = "Internal Server Error";
+      return this.responseStream.status(this.error.statusCode).send(errorResponseObj(this.error));
+    } else {
+      this.error.statusCode = 500;
+      if (isDevEnvironment) {
+        return this.responseStream.status(500).send(errorResponseObj(this.error));
+      } else {
+        this.error.message = "Internal Server Error";
+        return this.responseStream.status(500).send(errorResponseObj(this.error));
+      }
+    }
+  }
+  async checkForDatabaseErrorAndSendResponse() {
+    return null;
+  }
+};
+var ErrorHandler_default = ErrorHandler;
+function errorResponseObj(error) {
+  if (isDevEnvironment) {
+    return {
+      ...error,
+      error: true,
+      message: error.message,
+      stack: error.stack,
+      data: []
+    };
+  } else {
+    return ApiResponse_default.error(error.message, error.statusCode);
+  }
+}
+
+// src/frameworks/express/middlewares/errorMiddleware.ts
+var errorMiddleware = (err, _, res, __) => {
+  const errorHandler = new ErrorHandler_default(res, err);
+  return errorHandler.handleError();
+};
+
+// src/frameworks/express/server.ts
 function configServer() {
   const app2 = (0, import_express3.default)();
   app2.use(import_express3.default.json());
   app2.use(cors);
   app2.use("/api/v1", allAppRoutes);
   app2.use("/", (_, res) => res.send("Welcome to the API"));
+  app2.use(errorMiddleware);
   return app2;
 }
 

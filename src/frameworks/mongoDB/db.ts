@@ -1,4 +1,4 @@
-import { DB_CONN_STR } from '@config/index.js';
+import { DB_CONN_STR } from '@utils/helpers/config.js';
 import mongoose from 'mongoose';
 
 export async function connectToDatabase() {
